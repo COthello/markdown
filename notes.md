@@ -7,3 +7,9 @@ affine是用来做polyhedral变换的，affine中常用的两个属性，dimensi
  # TVM
   
   host 和 kernel的融合，比如能够分析不同kernel的两个block的依赖关系。
+ 
+ # oneflow
+ 
+ split，broadcast，partial，三种操作，针对tensor，可以实现模型和数据并行
+ 
+ Tile IR的抽象，帮助硬件上更优的执行。
