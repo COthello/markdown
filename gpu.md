@@ -1,0 +1,3 @@
+Recently nVidia has been reducing the number of ROPs on their graphics cards as shading power gets more and more important. For example, the 6600GT had 8 fragment pipelines, but only 4 ROPs. However, in just about any modern game, far more than 1 cycle is spent shading each pixel. Thus, cards with the same number of ROPs as fragment pipelines would end up with ROPs sitting idle waiting for input.
+
+The move towards fewer ROPs than fragment pipelines is a way gpu designers eliminate unneeded complexity from their chips without sacrificing performance. And less complexity means higher speeds and better yields will be attainable.
