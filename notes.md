@@ -13,3 +13,47 @@ affine是用来做polyhedral变换的，affine中常用的两个属性，dimensi
  split，broadcast，partial，三种操作，针对tensor，可以实现模型和数据并行
  
  Tile IR的抽象，帮助硬件上更优的执行。
+ 
+ # llvm
+ 
+ class InstrMapping
+ {  string FilterClass;  list<string> RowFields = [];  list<string> ColFields = [];  list<string> KeyCol = [];  list<list<string> > ValueCols = []; } 
+
+图2其中，FilterClass域规定了各指令类的基类，可减少使用关系模型的指令的搜索空间。RowFields域规定了关系表中在同一行的所有指令必须保持相同的属性。ColFields域规定了关系表中在同一列的所有指令必须保持相同的属性，这里仅规定了属性名称。KeyCol域规定了关键指令的ColFields域的属性值，这个属性值实际上就是关系表的关键指令，关键指令会被关系表转换成其它指令，这些指令在ValueCols域中规定。
+
+作者：Frank Wang
+链接：https://zhuanlan.zhihu.com/p/55807207
+
+ 把关系中的key转变为value代表的指令。
+ 
+ AMD中定义的代码映射关系如下：
+ 
+ ```
+ 
+ def getMCOpcodeGen : InstrMapping {
+  let FilterClass = "SIMCInstr";
+  let RowFields = ["PseudoInstr"];
+  let ColFields = ["Subtarget"];
+  let KeyCol = [!cast<string>(SIEncodingFamily.NONE)];
+  // These columns must be kept in sync with the SIEncodingFamily enumeration.
+  let ValueCols = [[!cast<string>(SIEncodingFamily.SI)],
+                   [!cast<string>(SIEncodingFamily.VI)],
+                   [!cast<string>(SIEncodingFamily.SDWA)],
+                   [!cast<string>(SIEncodingFamily.SDWA9)],
+                   // GFX80 encoding is added to work around a multiple matching
+                   // issue for buffer instructions with unpacked d16 data. This
+                   // does not actually change the encoding, and thus may be
+                   // removed later.
+                   [!cast<string>(SIEncodingFamily.GFX80)],
+                   [!cast<string>(SIEncodingFamily.GFX9)],
+                   [!cast<string>(SIEncodingFamily.GFX10)],
+                   [!cast<string>(SIEncodingFamily.SDWA10)],
+                   [!cast<string>(SIEncodingFamily.GFX90A)],
+                   [!cast<string>(SIEncodingFamily.GFX940)],
+                   [!cast<string>(SIEncodingFamily.GFX11)]];
+}
+ 
+ ```
+ 
+ 通过inst mapping把KeyCol转换为ValueCols的指令。伪指令的opcode编码是 SIEncodingFamily.NONE
+ 
